@@ -3,31 +3,29 @@
 <head>
     <meta charset="utf-8">
     
-    <title>About Icarus | Octarine Space</title>
+    <title>Swift 中的 String.endIndex | Octarine Space</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="The blog theme you may fall in love with, coming to Hexo. Preview
-View DocumentationIt is strongly recommended that you read the docs before using Icarus.
-FeaturesProfile SidebarA nice place to show y">
-<meta property="og:type" content="website">
-<meta property="og:title" content="About Icarus">
-<meta property="og:url" content="http://eames.im/about/index.html">
+    <meta name="description" content="偶然在知乎发现了一个很有意思的问题，在这里记录一下分析过程。
+
+以下是问题（已更新至Swift3.1）：
+1234567891011&amp;gt; let greeting = &quot;zhang❤️\u&amp;#123;1f40c&amp;#125;&quot;    // 这是一个包含 unicode 的 String。&amp;gt;&amp;gt; greeting.endIndex    // 9&amp;gt; greeting.index(b">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swift 中的 String.endIndex">
+<meta property="og:url" content="http://eames.im/2017/02/07/String-endIndex/index.html">
 <meta property="og:site_name" content="Octarine Space">
-<meta property="og:description" content="The blog theme you may fall in love with, coming to Hexo. Preview
-View DocumentationIt is strongly recommended that you read the docs before using Icarus.
-FeaturesProfile SidebarA nice place to show y">
-<meta property="og:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/preview.png">
-<meta property="og:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/profile.png">
-<meta property="og:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/insight-search.png">
-<meta property="og:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/custom-comments.png">
-<meta property="og:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/responsive.jpg">
-<meta property="og:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/lightgallery.jpg">
-<meta property="og:updated_time" content="2016-10-19T22:59:38.000Z">
+<meta property="og:description" content="偶然在知乎发现了一个很有意思的问题，在这里记录一下分析过程。
+
+以下是问题（已更新至Swift3.1）：
+1234567891011&amp;gt; let greeting = &quot;zhang❤️\u&amp;#123;1f40c&amp;#125;&quot;    // 这是一个包含 unicode 的 String。&amp;gt;&amp;gt; greeting.endIndex    // 9&amp;gt; greeting.index(b">
+<meta property="og:image" content="http://eames.im/../../../../../gallery/Swift_Character.png">
+<meta property="og:updated_time" content="2017-02-07T10:01:55.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="About Icarus">
-<meta name="twitter:description" content="The blog theme you may fall in love with, coming to Hexo. Preview
-View DocumentationIt is strongly recommended that you read the docs before using Icarus.
-FeaturesProfile SidebarA nice place to show y">
-<meta name="twitter:image" content="http://ppoffice.github.io/hexo-theme-icarus/gallery/preview.png">
+<meta name="twitter:title" content="Swift 中的 String.endIndex">
+<meta name="twitter:description" content="偶然在知乎发现了一个很有意思的问题，在这里记录一下分析过程。
+
+以下是问题（已更新至Swift3.1）：
+1234567891011&amp;gt; let greeting = &quot;zhang❤️\u&amp;#123;1f40c&amp;#125;&quot;    // 这是一个包含 unicode 的 String。&amp;gt;&amp;gt; greeting.endIndex    // 9&amp;gt; greeting.index(b">
+<meta name="twitter:image" content="http://eames.im/../../../../../gallery/Swift_Character.png">
 <link rel="publisher" href="116254043212645240000">
     
 
@@ -234,7 +232,7 @@ ga('send', 'pageview');
 </aside>
 
             
-            <section id="main"><article id="page-undefined" class="article article-type-page" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-String-endIndex" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -242,10 +240,29 @@ ga('send', 'pageview');
                 
     
         <h1 class="article-title" itemprop="name">
-            About Icarus
+            Swift 中的 String.endIndex
         </h1>
     
 
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/07/String-endIndex/">
+            <time datetime="2017-02-07T08:30:36.000Z" itemprop="datePublished">2017-02-07</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Swift/">Swift</a>
+    </div>
+
+                    </div>
                 
             </header>
         
@@ -253,30 +270,21 @@ ga('send', 'pageview');
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h3 id="The-blog-theme-you-may-fall-in-love-with-coming-to-Hexo-Preview"><a href="#The-blog-theme-you-may-fall-in-love-with-coming-to-Hexo-Preview" class="headerlink" title="The blog theme you may fall in love with, coming to Hexo. Preview"></a>The blog theme you may fall in love with, coming to Hexo. <a href="http://ppoffice.github.io/hexo-theme-icarus/" target="_blank" rel="external">Preview</a></h3><p><img src="http://ppoffice.github.io/hexo-theme-icarus/gallery/preview.png" alt=""></p>
-<h4 id="View-Documentation"><a href="#View-Documentation" class="headerlink" title="View Documentation"></a><a href="https://github.com/ppoffice/hexo-theme-icarus/wiki" target="_blank" rel="external">View Documentation</a></h4><p>It is strongly recommended that you read the docs before using Icarus.</p>
-<h2 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h2><h3 id="Profile-Sidebar"><a href="#Profile-Sidebar" class="headerlink" title="Profile Sidebar"></a>Profile Sidebar</h3><p>A nice place to show yourself. You can add your own information in your site’s <code>_config.yml</code></p>
-<p><img src="http://ppoffice.github.io/hexo-theme-icarus/gallery/profile.png" alt=""></p>
-<h3 id="Self-hosted-Insite-Search-Engine"><a href="#Self-hosted-Insite-Search-Engine" class="headerlink" title="Self-hosted Insite Search Engine"></a>Self-hosted Insite Search Engine</h3><p>With the help of <a href="https://github.com/ppoffice/hexo-theme-icarus/wiki/Search#insight-search" target="_blank" rel="external">Insight Search</a>, you can search anything inside your site without any third-party plugin.</p>
-<p><img src="http://ppoffice.github.io/hexo-theme-icarus/gallery/insight-search.png" alt=""></p>
-<h3 id="Custom-Comment-Services"><a href="#Custom-Comment-Services" class="headerlink" title="Custom Comment Services"></a>Custom Comment Services</h3><p>Icarus supports several comment services, give you better choices to communicate with your readers.</p>
-<p><img src="http://ppoffice.github.io/hexo-theme-icarus/gallery/custom-comments.png" alt=""></p>
-<h3 id="Post-Banner-amp-Thumbnail"><a href="#Post-Banner-amp-Thumbnail" class="headerlink" title="Post Banner &amp; Thumbnail"></a>Post Banner &amp; Thumbnail</h3><p>Thanks to <a href="https://github.com/atika" target="_blank" rel="external">atika</a>, you can now <a href="https://github.com/ppoffice/hexo-theme-icarus/wiki/Theme#thumbnail" target="_blank" rel="external">add thumbnails or banners</a> to every post to create better reading experience.</p>
-<h3 id="Responsive-Layout"><a href="#Responsive-Layout" class="headerlink" title="Responsive Layout"></a>Responsive Layout</h3><p>Icarus knows on what screen size you are browsering the website, and reorganize the layout to fit your device.</p>
-<p><img src="http://ppoffice.github.io/hexo-theme-icarus/gallery/responsive.jpg" alt=""></p>
-<h3 id="Custom-Categories-amp-Tags-Pages"><a href="#Custom-Categories-amp-Tags-Pages" class="headerlink" title="Custom Categories &amp; Tags Pages"></a>Custom Categories &amp; Tags Pages</h3><p>Get your categories and tags listed in single pages to make your blog more methodic.</p>
-<h3 id="lightgallery"><a href="#lightgallery" class="headerlink" title="lightgallery"></a>lightgallery</h3><p>Icarus uses <a href="https://sachinchoolur.github.io/lightgallery.js/" target="_blank" rel="external">lightgallery.js</a> to showcase your photos. Just enable it in your configuration, and that’s all!</p>
-<p><img src="http://ppoffice.github.io/hexo-theme-icarus/gallery/lightgallery.jpg" alt=""></p>
-<h3 id="Sidebar"><a href="#Sidebar" class="headerlink" title="Sidebar"></a>Sidebar</h3><p>Icarus provides 6 built-in widgets:</p>
-<ul>
-<li>recent_posts</li>
-<li>category</li>
-<li>archives</li>
-<li>tag</li>
-<li>tagcloud</li>
-<li>links</li>
-</ul>
-<p>All of them are enabled by default. You can edit them in <code>widget</code> setting.</p>
+            <p>偶然在知乎发现了<a href="https://www.zhihu.com/question/36963886" target="_blank" rel="external">一个很有意思的问题</a>，在这里记录一下分析过程。</p>
+<blockquote>
+<p>以下是问题（已更新至Swift3.1）：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="keyword">let</span> greeting = <span class="string">"zhang❤️\u&#123;1f40c&#125;"</span>    <span class="comment">// 这是一个包含 unicode 的 String。</span></div><div class="line">&gt;</div><div class="line">&gt; greeting.endIndex    <span class="comment">// 9</span></div><div class="line">&gt; greeting.index(before: greeting.endIndex)    <span class="comment">// 7</span></div><div class="line">&gt;</div><div class="line">&gt; <span class="keyword">for</span> index <span class="keyword">in</span> string.characters.<span class="built_in">indices</span> &#123;</div><div class="line">&gt;     <span class="built_in">print</span>(string[index] ,index)</div><div class="line">&gt; &#125;    <span class="comment">//这个循环共执行7次</span></div><div class="line">&gt;</div><div class="line">&gt; <span class="comment">// 以上9和7是怎么计算的？是什么样的关系？</span></div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+<a id="more"></a>
+<p>在这个问题中 <code>&quot;zhang❤️\u{1f40c}&quot;</code> 等价于<code>&quot;zhang❤️🐌&quot;</code> ( “\u{1f40c}” 是 🐌 在Swift字符串中的字符串字面量: <em>Unicode 标量</em> )。<br>循环共执行7次也很好理解，因为 <code>greeting</code> 中包含了z、h、a、n、g、❤️、🐌，七个 <code>Character</code> 。</p>
+<p>问题在于 endIndex 为 9。<br>按照我之前对 <code>String.endIndex</code> 的理解，<code>endIndex</code> 是字符串中最后一个有效下标向后一个位置的索引。即此处应为7。</p>
+<blockquote>
+<p>A string’s “past the end” position—that is, the position one greater than the last valid subscript argument.</p>
+<p>—— Swift Standard Library Documentation.<br>这时很容易就会联想到❤️和🐌都是由两个 Unicode标量 组合成的特殊字符，所以这里我遍历了 <code>greeting</code> 的所有 Unicode 标量。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> s <span class="keyword">in</span> greeting.unicodeScalars &#123;</div><div class="line">    <span class="built_in">print</span>(s, s.value, s.escaped(asASCII: <span class="literal">true</span>))</div><div class="line">&#125;</div><div class="line"><span class="comment">/*</span></div><div class="line">z 122 z</div><div class="line">h 104 h</div><div class="line">a 97 a</div><div class="line">n 110 n</div><div class="line">g 103 g</div><div class="line">❤ 10084 \u&#123;2764&#125;</div><div class="line">️ 65039 \u&#123;FE0F&#125;</div><div class="line">🐌 128012 \u&#123;0001F40C&#125;</div><div class="line">*/</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p>从输出结果可以看到❤️是由两个Unicode标量组合成的特殊字符，而 🐌 则是一个单独字符。</p>
+<p>既然关于 Unicode 标量 的猜想是错的，我只好老老实实的查看 <code>String.Character</code> 对应的 <code>Index</code> 了。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> index <span class="keyword">in</span> greeting.characters.<span class="built_in">indices</span> &#123;</div><div class="line">    <span class="built_in">print</span>(string[index] ,index)</div><div class="line">&#125;</div><div class="line"><span class="comment">/*</span></div><div class="line">z Index(_base: Swift.String.UnicodeScalarView.Index(_position: 0), _countUTF16: 1)</div><div class="line">h Index(_base: Swift.String.UnicodeScalarView.Index(_position: 1), _countUTF16: 1)</div><div class="line">a Index(_base: Swift.String.UnicodeScalarView.Index(_position: 2), _countUTF16: 1)</div><div class="line">n Index(_base: Swift.String.UnicodeScalarView.Index(_position: 3), _countUTF16: 1)</div><div class="line">g Index(_base: Swift.String.UnicodeScalarView.Index(_position: 4), _countUTF16: 1)</div><div class="line">❤️ Index(_base: Swift.String.UnicodeScalarView.Index(_position: 5), _countUTF16: 2)</div><div class="line">🐌 Index(_base: Swift.String.UnicodeScalarView.Index(_position: 7), _countUTF16: 2)</div><div class="line">*/</div></pre></td></tr></table></figure></p>
+<p>这下结果就非常明了了，由此可以猜想到 Swift 中的字符串在默认情况下可能是使用 UTF-16 进行编码存储的，结构大致如下图：<br><img src="../../../../../gallery/Swift_Character.png" alt="Swift_Character"><br>通过这幅图很容易就能理解 <code>greeting.endIndex</code> 为什么会是 9，以及向前一位的 Index 为什么会是7。</p>
 
         
         </div>
@@ -287,7 +295,7 @@ ga('send', 'pageview');
 
 </div>
 
-    <a data-url="http://eames.im/about/index.html" data-id="ciyvca68f000195fi3p9p2u2e" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://eames.im/2017/02/07/String-endIndex/" data-id="ciyvca68q000595fiyyrgp5da" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -355,13 +363,23 @@ ga('send', 'pageview');
 
             
     
-        <a href="http://eames.im/about/index.html#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://eames.im/about/index.html">评论</a>
+        <a href="http://eames.im/2017/02/07/String-endIndex/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://eames.im/2017/02/07/String-endIndex/">评论</a>
     
 
         </footer>
     </div>
     
         
+<nav id="article-nav">
+    
+    
+        <a href="/2017/02/03/annual-report-2016/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">我的 2016</div>
+        </a>
+    
+</nav>
+
 
     
 </article>
@@ -410,9 +428,9 @@ ga('send', 'pageview');
     <script>
     var disqus_config = function () {
         
-            this.page.url = 'http://eames.im/about/index.html';
+            this.page.url = 'http://eames.im/2017/02/07/String-endIndex/';
         
-        this.page.identifier = 'undefined';
+        this.page.identifier = 'String-endIndex';
     };
     (function() { 
         var d = document, s = d.createElement('script');  

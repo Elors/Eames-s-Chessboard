@@ -168,7 +168,7 @@ ga('send', 'pageview');
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                4
+                5
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -221,6 +221,138 @@ ga('send', 'pageview');
 
             
             <section id="main">
+    <article id="post-String-endIndex" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/07/String-endIndex/">Swift 中的 String.endIndex</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2017/02/07/String-endIndex/">
+            <time datetime="2017-02-07T08:30:36.000Z" itemprop="datePublished">2017-02-07</time>
+        </a>
+    </div>
+
+
+                        
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Swift/">Swift</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><p>偶然在知乎发现了<a href="https://www.zhihu.com/question/36963886">一个很有意思的问题</a>，在这里记录一下分析过程。</p>
+<blockquote>
+<p>以下是问题（已更新至Swift3.1）：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="keyword">let</span> greeting = <span class="string">"zhang❤️\u&#123;1f40c&#125;"</span>    <span class="comment">// 这是一个包含 unicode 的 String。</span></div><div class="line">&gt;</div><div class="line">&gt; greeting.endIndex    <span class="comment">// 9</span></div><div class="line">&gt; greeting.index(before: greeting.endIndex)    <span class="comment">// 7</span></div><div class="line">&gt;</div><div class="line">&gt; <span class="keyword">for</span> index <span class="keyword">in</span> string.characters.<span class="built_in">indices</span> &#123;</div><div class="line">&gt;     <span class="built_in">print</span>(string[index] ,index)</div><div class="line">&gt; &#125;    <span class="comment">//这个循环共执行7次</span></div><div class="line">&gt;</div><div class="line">&gt; <span class="comment">// 以上9和7是怎么计算的？是什么样的关系？</span></div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote></p>
+            <p class="article-more-link">
+                <a href="/2017/02/07/String-endIndex/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://eames.im/2017/02/07/String-endIndex/" data-id="ciyvca68q000595fiyyrgp5da" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="http://eames.im/2017/02/07/String-endIndex/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="http://eames.im/2017/02/07/String-endIndex/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-annual-report-2016" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -248,7 +380,7 @@ ga('send', 'pageview');
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/年终总结/">年终总结</a>
+        <a class="tag-link" href="/tags/谈笑风生/">谈笑风生</a>
     </div>
 
                     </div>
@@ -258,20 +390,7 @@ ga('send', 'pageview');
         
         <div class="article-entry" itemprop="articleBody">
         
-            <p><p>每年一到年终总是想写点什么。想想刚从学校出来实习那会儿，在年末公司是半强制性的要求员工提交年报的（其实还有月报和日报这种更恶心的东西）。那会儿虽然自己年末也确实有写点什么的冲动，但是一想到要“上交给层层领导”看，还能写得下去的东西也就没剩多少了。</p>
-<p>话虽如此，但是每逢过年自己总是有对整年的回顾和新年的展望，但是没有落到纸面上。从今年开始我都会将一年的总结记录在这里。</p>
-<blockquote>
-<p> 入手的Bose QuietComfort 35无线降噪耳机应该是最超值的了，除了价格很贵之外几乎没有缺点。Magic Trackpad 2 触控板 和 Logitech G900无线鼠标因为性价比较低只能屈居第二了。</p>
-<p>《你的名字。》毫无意外的成为了今年我最喜欢的电影。个人感性评分9.6分，理性评分8.9。</p>
-<p> 自己独立完成了一个App从零到上架的开发生命周期。</p>
-<p>将博客从文档工具转移到Github，并且封存了以前略显幼稚的博文。工具也从中期的 Jekyll 转移到现在的 Hexo 。</p>
-<p>重新拾起了自己几乎荒废的前端开发技能，并因工作原因接触了相当大量的前端知识，缓慢消化中。</p>
-<p>同样拾起了自己几乎荒废的英语技能，已经规划了详细可执行的计划。</p>
-<p>买了电钢琴，弹的次数却越来越少，现在很少会碰。</p>
-<p>第一次和外国人（巴基斯坦友人）同租房子，虽然还算愉快，但是依然很遗憾因为自己不善言谈和英语口语水平不足的问题，没能尽兴相处。</p>
-<p>一位对我影响很深的同事去了新加坡发展，希望他越来越强大。</p>
-</blockquote>
-<p>虽然每年都对自己都会有些规划，定些目标。但是说实话每年能够达成的目标最多也只有一半左右，还都是一些简单轻松、没有规律的非长期性目标计划。自己反思了一下原因：</p></p>
+            <p><p>每年一到年终总是想写点什么。想想刚从学校出来实习那会儿，在年末公司是半强制性的要求员工提交年报的（其实还有月报和日报这种更恶心的东西）。那会儿虽然自己年末也确实有写点什么的冲动，但是一想到要“上交给层层领导”看，还能写得下去的东西也就没剩多少了。</p></p>
             <p class="article-more-link">
                 <a href="/2017/02/03/annual-report-2016/#more">查看更多</a>
             </p>
@@ -284,7 +403,7 @@ ga('send', 'pageview');
 
 </div>
 
-    <a data-url="http://eames.im/2017/02/03/annual-report-2016/" data-id="ciyqmnq180005gtfivr3g0de0" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://eames.im/2017/02/03/annual-report-2016/" data-id="ciyvca68a000095fi9fv93n4h" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -422,7 +541,7 @@ ga('send', 'pageview');
 
 </div>
 
-    <a data-url="http://eames.im/2017/01/04/front-end-topic/" data-id="ciyqmnq140004gtfi5jkl9dto" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://eames.im/2017/01/04/front-end-topic/" data-id="ciyvca68y000895filw71ypt9" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -527,7 +646,7 @@ ga('send', 'pageview');
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/技巧/">技巧</a>
+        <a class="tag-link" href="/tags/姿势水平/">姿势水平</a>
     </div>
 
                     </div>
@@ -550,7 +669,7 @@ ga('send', 'pageview');
 
 </div>
 
-    <a data-url="http://eames.im/2016/11/08/shadowsocks/" data-id="ciyqmnq0y0002gtfiqhcweutx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://eames.im/2016/11/08/shadowsocks/" data-id="ciyvca68h000295fibf6h1ydt" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -655,7 +774,7 @@ ga('send', 'pageview');
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/方法/">方法</a>
+        <a class="tag-link" href="/tags/姿势水平/">姿势水平</a>
     </div>
 
                     </div>
@@ -683,7 +802,7 @@ ga('send', 'pageview');
 
 </div>
 
-    <a data-url="http://eames.im/2016/11/06/tomato/" data-id="ciyqmnq0t0000gtfiqep7pga5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="http://eames.im/2016/11/06/tomato/" data-id="ciyvca68u000795figumoo3d6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -770,7 +889,7 @@ ga('send', 'pageview');
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/前端/" style="font-size: 10px;">前端</a> <a href="/tags/年终总结/" style="font-size: 10px;">年终总结</a> <a href="/tags/技巧/" style="font-size: 10px;">技巧</a> <a href="/tags/方法/" style="font-size: 10px;">方法</a>
+            <a href="/tags/Swift/" style="font-size: 10px;">Swift</a> <a href="/tags/前端/" style="font-size: 10px;">前端</a> <a href="/tags/姿势水平/" style="font-size: 20px;">姿势水平</a> <a href="/tags/谈笑风生/" style="font-size: 10px;">谈笑风生</a>
         </div>
     </div>
 
