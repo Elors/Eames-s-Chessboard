@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Octarine Space</title>
+  <subtitle>嘀嘀嗒嗒，嘀嘀嗒嗒</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://eames.im/"/>
+  <updated>2017-02-07T10:01:55.000Z</updated>
+  <id>http://eames.im/</id>
+  
+  <author>
+    <name>Elors</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Swift 中的 String.endIndex</title>
+    <link href="http://eames.im/2017/02/07/String-endIndex/"/>
+    <id>http://eames.im/2017/02/07/String-endIndex/</id>
+    <published>2017-02-07T08:30:36.000Z</published>
+    <updated>2017-02-07T10:01:55.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>偶然在知乎发现了<a href="https://www.zhihu.com/question/36963886" target="_blank" rel="external">一个很有意思的问题</a>，在这里记录一下分析过程。</p>
+<blockquote>
+<p>以下是问题（已更新至Swift3.1）：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&gt; <span class="keyword">let</span> greeting = <span class="string">"zhang❤️\u&#123;1f40c&#125;"</span>    <span class="comment">// 这是一个包含 unicode 的 String。</span></div><div class="line">&gt;</div><div class="line">&gt; greeting.endIndex    <span class="comment">// 9</span></div><div class="line">&gt; greeting.index(before: greeting.endIndex)    <span class="comment">// 7</span></div><div class="line">&gt;</div><div class="line">&gt; <span class="keyword">for</span> index <span class="keyword">in</span> string.characters.<span class="built_in">indices</span> &#123;</div><div class="line">&gt;     <span class="built_in">print</span>(string[index] ,index)</div><div class="line">&gt; &#125;    <span class="comment">//这个循环共执行7次</span></div><div class="line">&gt;</div><div class="line">&gt; <span class="comment">// 以上9和7是怎么计算的？是什么样的关系？</span></div><div class="line">&gt;</div></pre></td></tr></table></figure>
+</blockquote>
+<a id="more"></a>
+<p>在这个问题中 <code>&quot;zhang❤️\u{1f40c}&quot;</code> 等价于<code>&quot;zhang❤️🐌&quot;</code> ( “\u{1f40c}” 是 🐌 在Swift字符串中的字符串字面量: <em>Unicode 标量</em> )。<br>循环共执行7次也很好理解，因为 <code>greeting</code> 中包含了z、h、a、n、g、❤️、🐌，七个 <code>Character</code> 。</p>
+<p>问题在于 endIndex 为 9。<br>按照我之前对 <code>String.endIndex</code> 的理解，<code>endIndex</code> 是字符串中最后一个有效下标向后一个位置的索引。即此处应为7。</p>
+<blockquote>
+<p>A string’s “past the end” position—that is, the position one greater than the last valid subscript argument.</p>
+<p>—— Swift Standard Library Documentation.<br>这时很容易就会联想到❤️和🐌都是由两个 Unicode标量 组合成的特殊字符，所以这里我遍历了 <code>greeting</code> 的所有 Unicode 标量。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> s <span class="keyword">in</span> greeting.unicodeScalars &#123;</div><div class="line">    <span class="built_in">print</span>(s, s.value, s.escaped(asASCII: <span class="literal">true</span>))</div><div class="line">&#125;</div><div class="line"><span class="comment">/*</span></div><div class="line">z 122 z</div><div class="line">h 104 h</div><div class="line">a 97 a</div><div class="line">n 110 n</div><div class="line">g 103 g</div><div class="line">❤ 10084 \u&#123;2764&#125;</div><div class="line">️ 65039 \u&#123;FE0F&#125;</div><div class="line">🐌 128012 \u&#123;0001F40C&#125;</div><div class="line">*/</div></pre></td></tr></table></figure></p>
+</blockquote>
+<p>从输出结果可以看到❤️是由两个Unicode标量组合成的特殊字符，而 🐌 则是一个单独字符。</p>
+<p>既然关于 Unicode 标量 的猜想是错的，我只好老老实实的查看 <code>String.Character</code> 对应的 <code>Index</code> 了。<br><figure class="highlight swift"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> index <span class="keyword">in</span> greeting.characters.<span class="built_in">indices</span> &#123;</div><div class="line">    <span class="built_in">print</span>(string[index] ,index)</div><div class="line">&#125;</div><div class="line"><span class="comment">/*</span></div><div class="line">z Index(_base: Swift.String.UnicodeScalarView.Index(_position: 0), _countUTF16: 1)</div><div class="line">h Index(_base: Swift.String.UnicodeScalarView.Index(_position: 1), _countUTF16: 1)</div><div class="line">a Index(_base: Swift.String.UnicodeScalarView.Index(_position: 2), _countUTF16: 1)</div><div class="line">n Index(_base: Swift.String.UnicodeScalarView.Index(_position: 3), _countUTF16: 1)</div><div class="line">g Index(_base: Swift.String.UnicodeScalarView.Index(_position: 4), _countUTF16: 1)</div><div class="line">❤️ Index(_base: Swift.String.UnicodeScalarView.Index(_position: 5), _countUTF16: 2)</div><div class="line">🐌 Index(_base: Swift.String.UnicodeScalarView.Index(_position: 7), _countUTF16: 2)</div><div class="line">*/</div></pre></td></tr></table></figure></p>
+<p>这下结果就非常明了了，由此可以猜想到 Swift 中的字符串在默认情况下可能是使用 UTF-16 进行编码存储的，结构大致如下图：<br><img src="../../../../../gallery/Swift_Character.png" alt="Swift_Character"><br>通过这幅图很容易就能理解 <code>greeting.endIndex</code> 为什么会是 9，以及向前一位的 Index 为什么会是7。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;偶然在知乎发现了&lt;a href=&quot;https://www.zhihu.com/question/36963886&quot;&gt;一个很有意思的问题&lt;/a&gt;，在这里记录一下分析过程。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;以下是问题（已更新至Swift3.1）：&lt;/p&gt;
+&lt;figure class=&quot;highlight swift&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt; &lt;span class=&quot;keyword&quot;&gt;let&lt;/span&gt; greeting = &lt;span class=&quot;string&quot;&gt;&quot;zhang❤️\u&amp;#123;1f40c&amp;#125;&quot;&lt;/span&gt;    &lt;span class=&quot;comment&quot;&gt;// 这是一个包含 unicode 的 String。&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt; greeting.endIndex    &lt;span class=&quot;comment&quot;&gt;// 9&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt; greeting.index(before: greeting.endIndex)    &lt;span class=&quot;comment&quot;&gt;// 7&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt; &lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt; index &lt;span class=&quot;keyword&quot;&gt;in&lt;/span&gt; string.characters.&lt;span class=&quot;built_in&quot;&gt;indices&lt;/span&gt; &amp;#123;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt;     &lt;span class=&quot;built_in&quot;&gt;print&lt;/span&gt;(string[index] ,index)&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt; &amp;#125;    &lt;span class=&quot;comment&quot;&gt;//这个循环共执行7次&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt; &lt;span class=&quot;comment&quot;&gt;// 以上9和7是怎么计算的？是什么样的关系？&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Swift" scheme="http://eames.im/tags/Swift/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>我的 2016</title>
+    <link href="http://eames.im/2017/02/03/annual-report-2016/"/>
+    <id>http://eames.im/2017/02/03/annual-report-2016/</id>
+    <published>2017-02-03T12:17:05.000Z</published>
+    <updated>2017-02-07T09:51:51.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>每年一到年终总是想写点什么。想想刚从学校出来实习那会儿，在年末公司是半强制性的要求员工提交年报的（其实还有月报和日报这种更恶心的东西）。那会儿虽然自己年末也确实有写点什么的冲动，但是一想到要“上交给层层领导”看，还能写得下去的东西也就没剩多少了。</p>
+<a id="more"></a>
+<p>话虽如此，但是每逢过年自己总是有对整年的回顾和新年的展望，但是没有落到纸面上。从今年开始我都会将一年的总结记录在这里。</p>
+<blockquote>
+<p> 入手的Bose QuietComfort 35无线降噪耳机应该是最超值的了，除了价格很贵之外几乎没有缺点。Magic Trackpad 2 触控板 和 Logitech G900无线鼠标因为性价比较低只能屈居第二了。</p>
+<p> 《你的名字。》毫无意外的成为了今年我最喜欢的电影。个人感性评分9.6分，理性评分8.9。</p>
+<p> 自己独立完成了一个App从零到上架的开发生命周期。</p>
+<p> 将博客从文档工具转移到Github，并且封存了以前略显幼稚的博文。工具也从中期的 Jekyll 转移到现在的 Hexo 。</p>
+<p> 重新拾起了自己几乎荒废的前端开发技能，并因工作原因接触了相当大量的前端知识，缓慢消化中。</p>
+<p> 同样拾起了自己几乎荒废的英语技能，已经规划了详细可执行的计划。</p>
+<p> 买了电钢琴，弹的次数却越来越少，现在很少会碰。</p>
+<p> 第一次和外国人（巴基斯坦友人）同租房子，虽然还算愉快，但是依然很遗憾因为自己不善言谈和英语口语水平不足的问题，没能尽兴相处。</p>
+<p> 一位对我影响很深的同事去了新加坡发展，希望他越来越强大。</p>
+</blockquote>
+<p>虽然每年都对自己都会有些规划，定些目标。但是说实话每年能够达成的目标最多也只有一半左右，还都是一些简单轻松、没有规律的非长期性目标计划。自己反思了一下原因：</p>
+<ul>
+<li><p>自己的懒惰和拖延症是主要原因。</p>
+<p>（套用《自控力》中的一句话——“自控只是一时的行为，力不从心和失控则是常态。”）</p>
+</li>
+<li><p>目标都只做了简单的记录，而没有分享出来，助长了自己的懒惰。</p>
+</li>
+<li><p>目标粒度不够细导致可行性差。</p>
+</li>
+</ul>
+<p>所以我决定从今年开始把自己接下来一年的计划和要达成的目标记录在这里。</p>
+<ol>
+<li>读至少5本普通书籍（这个每年都是达不到）和2本专业书籍。</li>
+<li>至少写10篇博客（这个每年也是达不到）。</li>
+<li>配合《自控力》做一些认知和训练。</li>
+<li>每周至少做6篇美语会话训练。</li>
+<li>重新自学《数据结构》，并持续在博客做记录。</li>
+<li>使用Swift做一个日程管理软件。</li>
+<li>日语达到N2水平。</li>
+<li>玩Dota2的时间少于120小时（当前累计1380小时），这应该是最难的 : )。</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;每年一到年终总是想写点什么。想想刚从学校出来实习那会儿，在年末公司是半强制性的要求员工提交年报的（其实还有月报和日报这种更恶心的东西）。那会儿虽然自己年末也确实有写点什么的冲动，但是一想到要“上交给层层领导”看，还能写得下去的东西也就没剩多少了。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="谈笑风生" scheme="http://eames.im/tags/%E8%B0%88%E7%AC%91%E9%A3%8E%E7%94%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>前端知识小记</title>
+    <link href="http://eames.im/2017/01/04/front-end-topic/"/>
+    <id>http://eames.im/2017/01/04/front-end-topic/</id>
+    <published>2017-01-04T04:09:16.000Z</published>
+    <updated>2017-01-04T04:49:44.000Z</updated>
+    
+    <content type="html"><![CDATA[<ul>
+<li><p>Vue</p>
+<blockquote>
+<p>Vue.js（读音 /vjuː/, 类似于 <strong>view</strong>） 是一套构建用户界面的 <strong>渐进式框架</strong>。</p>
+<p>与其他重量级框架不同的是，Vue 采用自底向上增量开发的设计。Vue 的核心库只关注视图层，并且非常容易学习，非常容易与其它库或已有项目整合。另一方面，Vue 完全有能力驱动采用<a href="https://cn.vuejs.org/v2/guide/single-file-components.html" target="_blank" rel="external">单文件组件</a>和 <a href="https://github.com/vuejs/awesome-vue#libraries--plugins" target="_blank" rel="external">Vue 生态系统支持的库</a>开发的复杂单页应用。</p>
+<p>Vue.js 的目标是通过尽可能简单的 API 实现<strong>响应的数据绑定</strong>和<strong>组合的视图组件</strong>。</p>
+<p>如果你是有经验的前端开发者，想知道 Vue.js 与其它库/框架的区别，查看<a href="https://cn.vuejs.org/v2/guide/comparison.html" target="_blank" rel="external">对比其它框架</a>。</p>
+<p><a href="https://cn.vuejs.org" target="_blank" rel="external">Vue中文指南</a></p>
+</blockquote>
+</li>
+</ul>
+<a id="more"></a>
+<ul>
+<li><p>RequireJS</p>
+<blockquote>
+<p><a href="http://requirejs.org" target="_blank" rel="external">RequireJS</a> 是一个JavaScript模块加载器，它的诞生就是为了解决以下两个问题。</p>
+<ol>
+<li>实现js文件的异步加载，避免网页失去响应。</li>
+<li>管理模块之间的依赖性，便于代码的编写和维护。</li>
+</ol>
+<p><a href="http://www.requirejs.cn/home.html" target="_blank" rel="external">requirejs中文指南</a></p>
+</blockquote>
+</li>
+<li><p>Babel</p>
+<blockquote>
+<p><a href="https://babeljs.io/" target="_blank" rel="external">Babel</a>是一个广泛使用的转码器，可以将ES6的代码转为ES5代码，从而在现有环境执行。<br><a href="http://www.ruanyifeng.com/blog/2016/01/babel.html" target="_blank" rel="external">Babel 入门教程 - 阮一峰的网络日志</a></p>
+</blockquote>
+</li>
+<li><p>Webpack</p>
+<blockquote>
+<p><a href="https://webpack.github.io" target="_blank" rel="external">Webpack</a> 是一个前端资源模块化管理和打包工具。</p>
+<p>它可以将许多松散的模块按照依赖和规则打包成符合生产环境部署的前端资源。还可以将按需加载的模块进行代码分隔，等到实际需要的时候再异步加载。通过 loader 的转换，任何形式的资源都可以视作模块，比如 CommonJs 模块、 AMD 模块、 ES6 模块、CSS、图片、 JSON、Coffeescript、 LESS 等。</p>
+<p><a href="http://webpackdoc.com" target="_blank" rel="external">Webpack 中文指南</a></p>
+</blockquote>
+</li>
+<li><p>Stylus</p>
+<blockquote>
+<p><a href="http://stylus-lang.com" target="_blank" rel="external">Stylus</a>是一个CSS预处理器（框架）。</p>
+<p>来自NodeJS社区，所以和NodeJS走得很近，与JavaScript联系非常紧密。还有专门的 <a href="https://link.zhihu.com/?target=http%3A//learnboost.github.io/stylus/docs/js.html" target="_blank" rel="external">JavaScript API</a>。</p>
+<p>支持Ruby之类等等框架。</p>
+</blockquote>
+</li>
+</ul>
+<ul>
+<li><p>NPM</p>
+<blockquote>
+<p><a href="https://docs.npmjs.com" target="_blank" rel="external">NPM</a> （node package manager），通常称为node包管理器。顾名思义，它的主要功能就是管理node包，包括：安装、卸载、更新、查看、搜索、发布等。</p>
+<p><a href="http://www.npmjs.com.cn" target="_blank" rel="external">npm 中文文档</a></p>
+</blockquote>
+</li>
+</ul>
+<ul>
+<li><p>Pug   (rename from “Jade”)</p>
+<blockquote>
+<p>源于 Node.js 的 HTML 模板引擎</p>
+<p><a href="https://pugjs.org/" target="_blank" rel="external">Pug</a></p>
+</blockquote>
+</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Vue&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Vue.js（读音 /vjuː/, 类似于 &lt;strong&gt;view&lt;/strong&gt;） 是一套构建用户界面的 &lt;strong&gt;渐进式框架&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;与其他重量级框架不同的是，Vue 采用自底向上增量开发的设计。Vue 的核心库只关注视图层，并且非常容易学习，非常容易与其它库或已有项目整合。另一方面，Vue 完全有能力驱动采用&lt;a href=&quot;https://cn.vuejs.org/v2/guide/single-file-components.html&quot;&gt;单文件组件&lt;/a&gt;和 &lt;a href=&quot;https://github.com/vuejs/awesome-vue#libraries--plugins&quot;&gt;Vue 生态系统支持的库&lt;/a&gt;开发的复杂单页应用。&lt;/p&gt;
+&lt;p&gt;Vue.js 的目标是通过尽可能简单的 API 实现&lt;strong&gt;响应的数据绑定&lt;/strong&gt;和&lt;strong&gt;组合的视图组件&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;如果你是有经验的前端开发者，想知道 Vue.js 与其它库/框架的区别，查看&lt;a href=&quot;https://cn.vuejs.org/v2/guide/comparison.html&quot;&gt;对比其它框架&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://cn.vuejs.org&quot;&gt;Vue中文指南&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+    
+      <category term="前端" scheme="http://eames.im/tags/%E5%89%8D%E7%AB%AF/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>配置Shadowsocks</title>
+    <link href="http://eames.im/2016/11/08/shadowsocks/"/>
+    <id>http://eames.im/2016/11/08/shadowsocks/</id>
+    <published>2016-11-08T14:56:50.000Z</published>
+    <updated>2017-02-07T09:49:25.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="配置VPS"><a href="#配置VPS" class="headerlink" title="配置VPS"></a>配置VPS</h3><a id="more"></a>
+<ol>
+<li><p>创建完实例后，打开终端进入到私钥所在文件夹。</p>
+</li>
+<li><p>更改文件权限</p>
+<p> chmod 400 key.pem</p>
+</li>
+<li><p>连接服务器：</p>
+<p>ssh -i key.pem  ubuntu@服务器IP</p>
+</li>
+<li><p>获取管理员权限</p>
+<p>sudo -s</p>
+</li>
+<li><p>更新</p>
+<p>apt-get update</p>
+</li>
+<li><p>安装</p>
+<p>python-pip</p>
+</li>
+<li><p>安装关键程序</p>
+<p>pip install shadowsocks</p>
+</li>
+<li><p>配置</p>
+<p> vi /etc/shadowsocks.json</p>
+<p>  单用户内容如下：<br>   {<br>   “server”:”0.0.0.0″,<br>   “server_port”:11383,  // 端口号为8989或11383<br>   “local_address”:”127.0.0.1″,<br>   “local_port”:1080,<br>   “password”:”password”,  // 密码可自行填写<br>   “timeout”:300,<br>   “method”:”aes-256-cfb”,<br>   “fast_open”: false<br>   }</p>
+<p>  或多用户如下：</p>
+<p>  {<br>  “server”:”0.0.0.0″,<br>  “local_address”:”127.0.0.1″,<br>  “local_port”:1080,<br>  “port_password”:{<br>  “8989”:”elors1270″,<br>  “11383”:”elors1270″<br>  },<br>  “timeout”:300,<br>  “method”:”aes-256-cfb”,<br>  “fast_open”: false<br>  }</p>
+</li>
+<li><p>启动 shadowsocks:</p>
+<p> ssserver -c /etc/shadowsocks.json -d start</p>
+</li>
+<li><p>添加开机启动项，即使意外重启也会自动启动shadowsocks</p>
+<p>vi /etc/rc.local<br>将第9步的命令完整复制到文件的第二行，保存并退出.</p>
+</li>
+</ol>
+<p>至此，VPS的配置完毕，之后可以使用SS客户端来实现科学上网。</p>
+<hr>
+<h3 id="配置VPN"><a href="#配置VPN" class="headerlink" title="配置VPN"></a>配置VPN</h3><ol>
+<li><p>连接服务器并获取管理员权限。</p>
+</li>
+<li><p>安装pptp service</p>
+<p> apt-get update</p>
+<p> aptitude install pptpd</p>
+</li>
+<li><p>编辑pptp配置文件</p>
+<p> sudo vim /etc/pptpd.conf</p>
+<p> localip 192.168.240.1</p>
+<p> remoteip 192.168.240.2-9</p>
+</li>
+<li><p>使用Google Public DNS</p>
+<p> sudo vim /etc/ppp/pptpd-options</p>
+<p> 去掉 <code>ms-dns</code> 的注释，并作修改如下</p>
+<p> ms-dns 8.8.8.8</p>
+<p> ms-dns 8.8.4.4</p>
+</li>
+<li><p>配置访问VPN的用户名和密码。可以重复添加，分配给不同的用户。</p>
+<p> echo “USERNAME pptpd PASSWORD *“ | sudo tee -a /etc/ppp/chap-secrets</p>
+</li>
+<li><p>重启服务</p>
+<p> sudo /etc/init.d/pptpd restart</p>
+</li>
+<li><p>配置数据转发</p>
+<p> sudo vim /etc/sysctl.conf</p>
+<p> 去掉 <code>net.ipv4.ip_forward=1</code> 行注释</p>
+<p> sudo sysctl -p</p>
+</li>
+<li><p>网络地址转换</p>
+<p> sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</p>
+</li>
+<li><p>确保服务器重启后服务可用</p>
+<p> sudo vim /etc/rc.local 在 <code>exit 0</code> 上面加一行</p>
+<p> iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE</p>
+</li>
+<li><p>进入ec2控制台，修改安全选项，在 <code>inbound</code> 和 <code>outbound</code> 里面都加入以下内容</p>
+<p>All TCP    TCP    0-65535    0.0.0.0/0</p>
+<p>All UDP    UDP    0-65535    0.0.0.0/0</p>
+<p>All ICMP    All    N/A     0.0.0.0/0</p>
+</li>
+<li><p>在客户端主机上建立VPN连接，填入虚拟机公网dns地址，用户名，密码，设置vpn的dns。</p>
+</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;配置VPS&quot;&gt;&lt;a href=&quot;#配置VPS&quot; class=&quot;headerlink&quot; title=&quot;配置VPS&quot;&gt;&lt;/a&gt;配置VPS&lt;/h3&gt;
+    
+    </summary>
+    
+    
+      <category term="姿势水平" scheme="http://eames.im/tags/%E5%A7%BF%E5%8A%BF%E6%B0%B4%E5%B9%B3/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>尝试使用番茄工作法</title>
+    <link href="http://eames.im/2016/11/06/tomato/"/>
+    <id>http://eames.im/2016/11/06/tomato/</id>
+    <published>2016-11-06T11:18:24.000Z</published>
+    <updated>2017-02-07T09:49:36.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="思想"><a href="#思想" class="headerlink" title="思想"></a>思想</h3><blockquote>
+<p>将日常的工作分割为若干个单元，每个单元约为30分钟。</p>
+<p>在番茄单元进行时，注意保持自己的全部精力集中在工作中，不被任何事情打断或分神。</p>
+<p>在番茄单元之间，进行合理的休息与放松。</p>
+</blockquote>
+<p>这种方法可以有效的帮助我们集中注意力。从而提提升时间利用率。</p>
+<a id="more"></a>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><ol>
+<li>在开始使用番茄工作法之前，先列出todo list，并按照优先级排好顺序。</li>
+<li>设置番茄时钟单元时间（通常为25～30分钟）。</li>
+<li>开始一个番茄单元的计时。</li>
+<li>在番茄单元进行中，注意集中自己的精力来完成预先安排好的任务。</li>
+<li>番茄单元计时结束，休息5分钟，活动身体等。</li>
+<li>重复3～5步，每完成4个番茄单元，休息15～30分钟。</li>
+</ol>
+<h3 id="提示"><a href="#提示" class="headerlink" title="提示"></a>提示</h3><ol>
+<li>进行番茄单元时，可以开启手机的<code>勿扰模式</code>。如果条件允许，带上一个降噪耳机，或者做任何能让注意力集中的事情都可以（比如听一些轻音乐、打开座位的台灯等）。</li>
+<li>随着番茄工作法的不断使用，你可以适当延长番茄单元的时长，当然不建议每个单元超过60分钟。</li>
+<li>在每天工作学习结束时，记得总结一下一天番茄单元的完成情况。</li>
+<li><code>番茄工作法</code>是一个帮助自己提升工作学习效率的方法，因此应该用最简单直接的方式使用它，比如使用纸笔的方式。</li>
+<li>在工作中番茄单元被打断是在所难免的，但是保持自己每天的番茄单元完成率也是很重要的。</li>
+<li>用不打扰其他人的方式执行番茄单元是个不错的选择。</li>
+</ol>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;思想&quot;&gt;&lt;a href=&quot;#思想&quot; class=&quot;headerlink&quot; title=&quot;思想&quot;&gt;&lt;/a&gt;思想&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;将日常的工作分割为若干个单元，每个单元约为30分钟。&lt;/p&gt;
+&lt;p&gt;在番茄单元进行时，注意保持自己的全部精力集中在工作中，不被任何事情打断或分神。&lt;/p&gt;
+&lt;p&gt;在番茄单元之间，进行合理的休息与放松。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;这种方法可以有效的帮助我们集中注意力。从而提提升时间利用率。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="姿势水平" scheme="http://eames.im/tags/%E5%A7%BF%E5%8A%BF%E6%B0%B4%E5%B9%B3/"/>
+    
+  </entry>
+  
+</feed>
